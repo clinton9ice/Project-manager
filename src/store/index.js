@@ -1,7 +1,6 @@
 import { createStore } from "vuex";
 import { dateCombined } from "@/components/Date";
 import { isEqual } from "@/helper/Helper";
-import { setTimeout } from "core-js";
 
 export default createStore({
   state: {
@@ -138,6 +137,7 @@ export default createStore({
             return (state.error = "No changes detected");
           }
           state.projects.splice(index, 1);
+          project.updated = dateCombined;
           return (state.projects = [...state.projects, project]);
         }
       });

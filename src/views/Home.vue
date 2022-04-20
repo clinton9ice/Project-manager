@@ -15,7 +15,10 @@
         :total="projectInProgress.length"
       >
         <div v-for="inProgress in projectInProgress" :key="inProgress.id">
-          <project-card :properties="inProgress" parent="inprogress"></project-card>
+          <project-card
+            :properties="inProgress"
+            parent="inprogress"
+          ></project-card>
         </div>
       </Collection>
 
@@ -29,8 +32,6 @@
         </div>
       </Collection>
     </div>
-
-
   </div>
 </template>
 

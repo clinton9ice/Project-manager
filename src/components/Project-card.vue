@@ -55,8 +55,14 @@
 
     <div class="project-description" v-if="!search">
       {{
-        properties.description ? properties.description.length > 100 ? removeTags(properties.description.slice(0, trim || 200)) +'...' : removeTags(properties.description)
-          : "Lorem ipsum dolor sit amet consectetur adipisicing elit. Beatae quam voluptate iure dolore sed suscipit itaque quasi quaerat iste nihil enim,natus, repellat dolorum! Quas eius quaerat nobis perferendis aperiam.".slice(0, trim || 200)
+        properties.description
+          ? properties.description.length > 100
+            ? removeTags(properties.description.slice(0, trim || 200)) + "..."
+            : removeTags(properties.description)
+          : "Lorem ipsum dolor sit amet consectetur adipisicing elit. Beatae quam voluptate iure dolore sed suscipit itaque quasi quaerat iste nihil enim,natus, repellat dolorum! Quas eius quaerat nobis perferendis aperiam.".slice(
+              0,
+              trim || 200
+            )
       }}
     </div>
 
@@ -95,7 +101,7 @@ export default {
     removeTags(data) {
       if (data === null || data === "") return false;
       data = data.toString();
-      return data.replaceAll(/(<([^>]+)>)/ig, "");
+      return data.replaceAll(/(<([^>]+)>)/gi, "");
     },
   },
 };

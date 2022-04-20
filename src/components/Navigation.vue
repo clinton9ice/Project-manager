@@ -19,19 +19,24 @@
         </form>
       </div>
     </nav>
-    <div class="search-result-container" v-if="data.openSearch" >
+    <div class="search-result-container" v-if="data.openSearch">
       <div class="d-flex justify-content-between align-items-end">
-        <h3 class="small text-muted"> Search result:
+        <h3 class="small text-muted">
+          Search result:
           <span v-if="data.searchResult.length < 1 && data.searchResult">
             <b> "{{ data.search }}" </b> not found
           </span>
         </h3>
-        <button type="button" @click="clearSearchResult" class="btn text-danger">
+        <button
+          type="button"
+          @click="clearSearchResult"
+          class="btn text-danger"
+        >
           <i class="bi bi-x"></i>
         </button>
       </div>
       <div class="container-fluid mt-4" v-if="data.searchResult.length > 0">
-        <div v-for=" project in data.searchResult" :key="project.id">
+        <div v-for="project in data.searchResult" :key="project.id">
           <project-card :search="true" :properties="project"></project-card>
         </div>
       </div>
@@ -77,7 +82,6 @@ export default {
       this.data.searchResult = "";
       this.data.openSearch = false;
       this.CLEAR();
-
     },
   },
   // computed:
@@ -85,7 +89,6 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-
 .header {
   margin-bottom: 1rem;
   position: sticky;

@@ -23,7 +23,7 @@
           <span class="text-brown" v-else> In task</span>
         </div>
       </div>
-      <p class="details px-5"  v-html="HTML(obj.project.description)" />
+      <p class="details px-5" v-html="HTML(obj.project.description)" />
     </div>
     <div v-else>
       <Loader name="wave" :overlay="true" />
@@ -56,7 +56,7 @@ export default {
         }
       });
     }
-    function HTML(text){
+    function HTML(text) {
       return text;
     }
     return { obj, getProject, HTML };

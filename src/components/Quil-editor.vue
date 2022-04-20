@@ -24,8 +24,8 @@ export default {
 };
 </script>
 
-<style scoped> 
-.ql-editor{
-min-height: inherit !important;
+<style scoped>
+.ql-editor {
+  min-height: inherit !important;
 }
 </style>

@@ -34,7 +34,10 @@
 
             <div class="mb-3">
               <label class="col-form-label">Description:</label>
-              <QuillEditor v-model:content="obj.description" style="min-height: 20vh !important;"/>
+              <QuillEditor
+                v-model:content="obj.description"
+                style="min-height: 20vh !important"
+              />
             </div>
 
             <div class="mb-3">
@@ -127,7 +130,7 @@ export default {
 </script>
 
 <style scoped>
-.ql-container.ql-snow{
+.ql-container.ql-snow {
   min-height: 20vh !important;
 }
 </style>
