@@ -1,9 +1,10 @@
 <template>
   <div class="container-fluid px-3 py-5">
+
     <h3 class="project-title">Projects</h3>
 
     <div class="project-container d-flex justify-content-between flex-wrap">
-      <Collection header="tasks" :total="allProject.length" v-if="allProject">
+      <Collection :total="allProject.length" v-if="allProject">
         <div v-for="project in allProject" :key="project.id">
           <project-card :properties="project"></project-card>
         </div>
@@ -32,6 +33,7 @@
         </div>
       </Collection>
     </div>
+    <modal :header="modal.header" :open="modal.isActive" />
   </div>
 </template>
 
@@ -39,14 +41,17 @@
 // import { reactive } from "vue";
 import Collection from "@/components/Collection";
 import ProjectCard from "@/components/Project-card";
+import Modal from "@/components/Modal";
 
-import { mapGetters } from "vuex";
+import { mapGetters, mapState } from "vuex";
 
 export default {
   components: {
     Collection,
     ProjectCard,
+    Modal
   },
-  computed: mapGetters(["allProject", "completeProjects", "projectInProgress"]),
+  computed: mapGetters(["allProject", "completeProjects", "projectInProgress", "modal"]),
 };
 </script>
+

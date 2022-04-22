@@ -21,3 +21,10 @@ pnpm-debug.log*
 *.njsproj
 *.sln
 *.sw?
+.firebase/
+.firebaserc
+.github/
+firebase.json
+firestore.indexes.json
+firestore.rules
+remoteconfig.template.json

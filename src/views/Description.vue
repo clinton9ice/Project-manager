@@ -1,7 +1,9 @@
 <template>
   <section class="about px-3 p-5">
     <div v-if="obj.isLoaded">
-      <div class="header d-flex align-items-start justify-content-between">
+      <div
+        class="header d-flex mb-sm-5 flex-wrap align-items-start justify-content-between"
+      >
         <div class="caption d-flex align-items-center">
           <div class="caption-check me-4">
             <i class="bi bi-check"></i>
@@ -13,11 +15,15 @@
             </p>
           </div>
         </div>
-        <div class="project-status border py-2 px-3 rounded-3">
+
+        <div class="project-status border py-2 ms-5 px-3 rounded-3">
           <span class="text-success" v-if="obj.project.complete">
             Completed</span
           >
-          <span class="text-danger" v-else-if="obj.project.inProgress">
+          <span
+            class="text-purple"
+            v-else-if="obj.project.state === 'inprogress'"
+          >
             In Progress</span
           >
           <span class="text-brown" v-else> In task</span>
@@ -25,9 +31,7 @@
       </div>
       <p class="details px-5" v-html="HTML(obj.project.description)" />
     </div>
-    <div v-else>
-      <Loader name="wave" :overlay="true" />
-    </div>
+    <Loader name="wave" v-else :overlay="true" />
   </section>
 </template>
 
@@ -87,9 +91,17 @@ export default {
     margin: 0 !important;
   }
 }
+.caption {
+  h1 {
+    max-width: 800px;
+  }
+}
 .project-status {
   .text-brown {
     color: #bb4545;
+  }
+  .text-purple {
+    color: var(--bs-purple);
   }
   font-weight: 500;
 }

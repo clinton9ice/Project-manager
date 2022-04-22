@@ -44,12 +44,15 @@ export default createStore({
     ],
     projectStatus: ["save", "inprogress", "complete"],
     modal: {
-      header: "",
+      header: "save",
       isActive: false,
     },
     searchResult: [],
     projectToEdit: "",
-    error: "",
+    message: {
+      error: null,
+      success: null,
+    },
   },
 
   getters: {
@@ -68,14 +71,14 @@ export default createStore({
         .filter((task) => task.state === "inprogress")
         .reverse();
     },
-    openModal(state) {
-      return state.modal.header;
+    modal(state) {
+      return state.modal;
     },
   },
 
   mutations: {
     GET_PROJECT(state, id) {
-      //Convert variable to number
+      //Convert is string to number
       id = Number(id);
       state.projectToEdit = state.projects.find((task) => task.id === id);
     },
@@ -85,22 +88,31 @@ export default createStore({
       project.complete = project.state.toLowerCase() === "complete";
       project.id = Math.ceil(Math.random() * Date.now());
       state.projects.push(project);
+      this.commit("SET_MESSAGE", { success: "Post Added successfully" });
+      this.commit("MODAL", "")
     },
 
-    EDIT_STATUS(state, project) {
+    CHANGE_STATE(state, project) {
       state.projects.find((task) => {
+        // Get the specific task from project list
         if (task.id === project.properties.id) {
-          task.state = "";
+          // Reset the task complete state upon call
           task.complete = false;
+          // Check for the project request state
           if (project.state) {
             if (project.state === "complete") task.complete = !project.complete;
+            // Update the state value
             task.state = project.state;
+            // Display success message
+            this.commit("SET_MESSAGE", {
+              success: "Project Updated "
+            });
           }
         }
       });
     },
 
-    OPEN_MODAL(state, title) {
+    MODAL(state, title) {
       state.modal = {
         header: title || "",
         isActive: !state.modal.isActive,
@@ -112,6 +124,10 @@ export default createStore({
         state.projects = state.projects.filter(
           (currentVal) => currentVal.id !== id
         );
+         this.commit("SET_MESSAGE", {
+           success: "Project deleted successfully"
+         });
+        
       }
     },
 
@@ -131,16 +147,33 @@ export default createStore({
 
     EDIT_PROJECT(state, project) {
       const p_id = project.id;
+      // Clear error
+      this.commit("CLEAR_MESSAGES");
+
       state.projects.find((task, index) => {
         if (task.id === p_id) {
           if (isEqual(task, project)) {
-            return (state.error = "No changes detected");
+            return state.message.error = "No changes detected";
           }
           state.projects.splice(index, 1);
           project.updated = dateCombined;
           return (state.projects = [...state.projects, project]);
         }
       });
+    },
+
+    SET_MESSAGE(state, { success, error }) {
+      // Clear messages
+      this.commit("CLEAR_MESSAGES")
+      // Set new error;
+      setTimeout(() => {
+        state.message.success = success || null;
+        state.message.error = error || null;
+      }, 200)
+    },
+
+    CLEAR_MESSAGES(state) {
+      return (state.message.error = null), (state.message.success = null);
     },
   },
 
@@ -154,11 +187,11 @@ export default createStore({
     },
 
     change_status({ commit }, project) {
-      return commit("EDIT_STATUS", project);
+      return commit("CHANGE_STATE", project);
     },
 
-    modal_status({ commit }, param) {
-      return commit("OPEN_MODAL", param);
+    init_modal({ commit }, param) {
+      return commit("MODAL", param);
     },
 
     get_single_project({ commit, state }, param) {
@@ -185,12 +218,18 @@ export default createStore({
     },
 
     edit_project({ state, commit }, project) {
-      state.error = "";
-      return new Promise((resolve, error) =>
+      commit("CLEAR_MESSAGES");
+
+      return new Promise((resolve) =>
         setTimeout(() => {
           commit("EDIT_PROJECT", project);
-          if (state.error) return error(state.error);
-          return resolve("Project Updated successfully");
+          if (!state.message.error){
+            commit("SET_MESSAGE", {
+              success: "Project Updated",
+            });
+            
+            return resolve("success");
+          }
         }, 1000)
       );
     },

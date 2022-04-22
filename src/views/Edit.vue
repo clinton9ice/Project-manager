@@ -90,6 +90,7 @@ export default {
   },
   methods: {
     project(id) {
+      // Search and append the result of the fetched project
       return this.store.dispatch("get_single_project", id).then((e) => {
         if (e) {
           // Destructure the request
@@ -106,14 +107,19 @@ export default {
         }
       });
     },
+
     updateProject() {
       //Check for complete state
       this.data.complete = this.data.state === "complete";
       //  Send to Edit
-      this.store
-        .dispatch("edit_project", this.data)
-        .then((e) => console.log(e))
-        .catch((er) => alert(er));
+      this.store.dispatch("edit_project", this.data).then((e) => {
+        if (e) {
+          console.log(e);
+          setTimeout(() => {
+            this.$router.push({name: "Home"})
+            }, 3000)
+        }
+      })
     },
   },
   created() {
