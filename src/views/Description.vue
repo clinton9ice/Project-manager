@@ -73,6 +73,10 @@ export default {
 </script>
 
 <style lang="scss">
+img{
+width: 100%;
+margin-bottom: 1rem !important;
+}
 .caption-check {
   height: 25px;
   width: 25px;
