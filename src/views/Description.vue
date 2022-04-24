@@ -1,38 +1,35 @@
 <template>
-  <section class="about px-3 p-5">
-    <div v-if="obj.isLoaded">
-      <div
-        class="header d-flex mb-sm-5 flex-wrap align-items-start justify-content-between"
-      >
-        <div class="caption d-flex align-items-center">
-          <div class="caption-check me-4">
-            <i class="bi bi-check"></i>
-          </div>
-          <div>
-            <h1>{{ obj.project.title }}</h1>
-            <p class="text-primary date">
-              {{ obj.project.date || "Not available" }}
-            </p>
-          </div>
+  <section class="about px-3 p-5" v-if="obj.project">
+    <div
+      class="header d-flex mb-sm-5 flex-wrap align-items-start justify-content-between"
+    >
+      <div class="caption d-flex align-items-center">
+        <div class="caption-check me-4">
+          <i class="bi bi-check"></i>
         </div>
-
-        <div class="project-status border py-2 ms-5 px-3 rounded-3">
-          <span class="text-success" v-if="obj.project.complete">
-            Completed</span
-          >
-          <span
-            class="text-purple"
-            v-else-if="obj.project.state === 'inprogress'"
-          >
-            In Progress</span
-          >
-          <span class="text-brown" v-else> In task</span>
+        <div>
+          <h1>{{ obj.project.title }}</h1>
+          <p class="text-primary date">
+            {{ obj.project.date || "Not available" }}
+          </p>
         </div>
       </div>
-      <p class="details px-5" v-html="HTML(obj.project.description)" />
+
+      <div class="project-status border py-2 ms-5 px-3 rounded-3">
+        <span class="text-success" v-if="obj.project.complete"> Completed</span>
+        <span
+          class="text-purple"
+          v-else-if="obj.project.state === 'inprogress'"
+        >
+          In Progress</span
+        >
+        <span class="text-brown" v-else> In task</span>
+      </div>
     </div>
-    <Loader name="wave" v-else :overlay="true" />
+
+    <p class="details px-5" v-html="HTML(obj.project.description)" />
   </section>
+  <loader v-else name="flow" :overlay="true" />
 </template>
 
 <script>
@@ -47,27 +44,23 @@ export default {
   },
   setup() {
     const obj = reactive({
-      id: null,
+      loaded: false,
       project: "",
-      isLoaded: false,
     });
     const store = useStore();
-    async function getProject(id) {
-      return store.dispatch("get_single_project", id).then((e) => {
-        if (e) {
-          obj.project = e;
-          obj.isLoaded = true;
-        }
-      });
-    }
+
     function HTML(text) {
       return text;
     }
-    return { obj, getProject, HTML };
+
+    return { store, obj, HTML };
   },
   created() {
     //get the parameter id from the route
-    this.getProject(this.$route.params.id);
+    this.store
+      .dispatch("get_single_project", this.$route.params.id)
+      .then((e) => (this.obj.project = e));
+    this.loaded = true;
   },
 };
 </script>

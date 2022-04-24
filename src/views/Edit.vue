@@ -54,13 +54,12 @@
       </form>
     </div>
   </div>
-  <Loader name="wave" :overlay="true" v-else />
+  <Loader name="flow" :overlay="true" v-else />
 </template>
 
 <script>
 import Loader from "@/components/Loader";
 import QuillEditor from "@/components/Quil-editor";
-// import { reactive } from "vue";
 import { useStore } from "vuex";
 
 export default {
@@ -95,7 +94,7 @@ export default {
         if (e) {
           // Destructure the request
           let { id, description, title, complete, state, date } = e;
-          //Set state
+
           //Set a default placeholders
           this.data.id = id;
           this.data.title = title;
@@ -103,23 +102,21 @@ export default {
           this.data.description = description || "";
           this.data.complete = complete;
           this.data.date = date;
-          this.isLoaded = true;
         }
+        this.isLoaded = true;
       });
     },
 
-    updateProject() {
+    async updateProject() {
       //Check for complete state
       this.data.complete = this.data.state === "complete";
+
       //  Send to Edit
-      this.store.dispatch("edit_project", this.data).then((e) => {
-        if (e) {
-          console.log(e);
-          setTimeout(() => {
-            this.$router.push({name: "Home"})
-            }, 3000)
-        }
-      })
+      await this.store.dispatch("edit_project", this.data);
+      // Redirect
+      setTimeout(() => {
+        this.$router.push({ name: "Home" });
+      }, 3000);
     },
   },
   created() {

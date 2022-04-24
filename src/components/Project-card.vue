@@ -2,7 +2,7 @@
   <div class="project-card" draggable="true">
     <div class="project-title dropdown header">
       <h5 class="caption" v-if="search">{{ properties.title }}</h5>
-      <h3 class="caption" v-else>{{ properties.title || "project title" }}</h3>
+      <h4 class="caption" v-else>{{ properties.title || "" }}</h4>
       <div class="dropdown-section" v-if="!search">
         <button
           class="btn w-100"
@@ -118,7 +118,7 @@ export default {
 
   .project-title {
     display: flex;
-    align-items: flex-end;
+    align-items: center;
     justify-content: space-between;
     margin-bottom: 0.3rem;
   }

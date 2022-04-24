@@ -1,58 +1,33 @@
 import { createStore } from "vuex";
 import { dateCombined } from "@/components/Date";
 import { isEqual } from "@/helper/Helper";
+import firestore from "../firebase/config";
+import {
+  collection,
+  getDocs,
+  getDoc,
+  addDoc,
+  setDoc,
+  doc,
+  deleteDoc,
+} from "firebase/firestore";
+// import { uid } from "uid";
 
 export default createStore({
   state: {
-    projects: [
-      {
-        date: "Apr, 01, 2021 ",
-        id: 1,
-        title: "Music website",
-        description:
-          "Some dummy text to write just to satisfy the eye and make the content meaninful and ellergic to something in lin e",
-        state: "save",
-        complete: false,
-      },
-      {
-        id: 6,
-        title: "Mobile Phone Store",
-        date: "Apr, 01, 2021 ",
-        description:
-          "Some dummy text to write just to satisfy the eye and make the content meaninful and ellergic to something in lin e",
-        state: "complete",
-        complete: true,
-      },
-      {
-        id: 2,
-        title: "Crypto Manager",
-        date: "Apr, 5, 2021 ",
-        description:
-          "Some dummy text to write just to satisfy the eye and make the content meaninful and ellergic to something in lin e",
-        state: "save",
-        complete: false,
-      },
-      {
-        id: 3,
-        title: "Clothing store",
-        date: "Apr, 10, 2021 ",
-        description:
-          "Some dummy text to write just to satisfy the eye and make the content meaninful and ellergic to something in lin e",
-        state: "inprogress",
-        complete: false,
-      },
-    ],
+    projects: [],
     projectStatus: ["save", "inprogress", "complete"],
     modal: {
       header: "save",
       isActive: false,
     },
     searchResult: [],
-    projectToEdit: "",
     message: {
       error: null,
       success: null,
     },
+    loaded: false,
+    offline: false,
   },
 
   getters: {
@@ -77,36 +52,75 @@ export default createStore({
   },
 
   mutations: {
-    GET_PROJECT(state, id) {
-      //Convert is string to number
-      id = Number(id);
-      state.projectToEdit = state.projects.find((task) => task.id === id);
+    async GET_PROJECT(state, id) {
+      const docRef = doc(firestore.db, "projects", id);
+
+      // Emoty the container
+      state.projectToEdit = [];
+
+      const docSnap = await getDoc(docRef);
+      if (docSnap.exists()) {
+        let result = docSnap.data();
+        return state.projectToEdit.push(result);
+      }
+
+      this.commit("SET_MESSAGE", {
+        error: "No such project in the collection!",
+      });
     },
 
-    ADD_PROJECT(state, project) {
+    async ADD_PROJECT(state, project) {
       if (typeof project !== "object") throw new Error("Project not an object");
+      let coll = collection(firestore.db, "projects");
+
       project.complete = project.state.toLowerCase() === "complete";
-      project.id = Math.ceil(Math.random() * Date.now());
-      state.projects.push(project);
-      this.commit("SET_MESSAGE", { success: "Post Added successfully" });
-      this.commit("MODAL", "")
+      // Set loader
+      state.loaded = false;
+      // Add new project to store
+      const res = await addDoc(coll, project);
+      if (res.id) {
+        project.id = res.id;
+        state.projects.push(project);
+
+        this.commit("SET_MESSAGE", {
+          success: "Post Added successfully",
+        });
+        this.commit("MODAL");
+        state.loaded = true;
+      }
     },
 
     CHANGE_STATE(state, project) {
       state.projects.find((task) => {
         // Get the specific task from project list
         if (task.id === project.properties.id) {
-          // Reset the task complete state upon call
+          // Set the task to default false
           task.complete = false;
-          // Check for the project request state
+
+          // Check for the project state
           if (project.state) {
-            if (project.state === "complete") task.complete = !project.complete;
-            // Update the state value
-            task.state = project.state;
-            // Display success message
-            this.commit("SET_MESSAGE", {
-              success: "Project Updated "
-            });
+            try {
+              if (project.state === "complete")
+                task.complete = !project.complete;
+              task.state = project.state;
+              // Update the state value
+              const result = setDoc(
+                doc(firestore.db, "projects", task.id),
+                task
+              );
+
+              if (result) {
+                // Display success message
+                this.commit("SET_MESSAGE", {
+                  success: "Project Updated ",
+                });
+                return;
+              }
+            } catch (error) {
+              this.commit("SET_MESSAGE", {
+                error: "something went wrong: project state change failed",
+              });
+            }
           }
         }
       });
@@ -121,13 +135,20 @@ export default createStore({
 
     DELETE_PROJECT(state, id) {
       if (confirm("Data will be lost permanently")) {
-        state.projects = state.projects.filter(
-          (currentVal) => currentVal.id !== id
-        );
-         this.commit("SET_MESSAGE", {
-           success: "Project deleted successfully"
-         });
-        
+        try {
+          deleteDoc(doc(firestore.db, "projects", id));
+          // Remove from store
+          state.projects = state.projects.filter(
+            (currentVal) => currentVal.id !== id
+          );
+          this.commit("SET_MESSAGE", {
+            success: "Project deleted successfully",
+          });
+        } catch (error) {
+          this.commit("SET_MESSAGE", {
+            error: "something happened: project not deleted",
+          });
+        }
       }
     },
 
@@ -145,31 +166,14 @@ export default createStore({
       return (state.searchResult = []);
     },
 
-    EDIT_PROJECT(state, project) {
-      const p_id = project.id;
-      // Clear error
-      this.commit("CLEAR_MESSAGES");
-
-      state.projects.find((task, index) => {
-        if (task.id === p_id) {
-          if (isEqual(task, project)) {
-            return state.message.error = "No changes detected";
-          }
-          state.projects.splice(index, 1);
-          project.updated = dateCombined;
-          return (state.projects = [...state.projects, project]);
-        }
-      });
-    },
-
     SET_MESSAGE(state, { success, error }) {
       // Clear messages
-      this.commit("CLEAR_MESSAGES")
+      this.commit("CLEAR_MESSAGES");
       // Set new error;
       setTimeout(() => {
         state.message.success = success || null;
         state.message.error = error || null;
-      }, 200)
+      }, 200);
     },
 
     CLEAR_MESSAGES(state) {
@@ -194,12 +198,21 @@ export default createStore({
       return commit("MODAL", param);
     },
 
-    get_single_project({ commit, state }, param) {
+    async get_single_project({ state, commit }, id) {
+      // Emoty the container
+      state.projectToEdit = [];
+      const docRef = doc(firestore.db, "projects", id);
+      const docSnap = await getDoc(docRef);
+
       return new Promise((resolve) => {
-        setTimeout(() => {
-          commit("GET_PROJECT", param);
-          resolve(state.projectToEdit);
-        }, 1000);
+        if (docSnap.exists()) {
+          let result = docSnap.data();
+          result.id = docSnap.id;
+          resolve(result);
+        }
+        commit("SET_MESSAGE", {
+          error: "The requested project does not exist",
+        });
       });
     },
 
@@ -217,21 +230,60 @@ export default createStore({
       );
     },
 
-    edit_project({ state, commit }, project) {
-      commit("CLEAR_MESSAGES");
+    async edit_project({ state, commit }, project) {
+      project.updated = dateCombined;
+      state.loaded = false;
 
-      return new Promise((resolve) =>
-        setTimeout(() => {
-          commit("EDIT_PROJECT", project);
-          if (!state.message.error){
-            commit("SET_MESSAGE", {
-              success: "Project Updated",
+      await setDoc(doc(firestore.db, "projects", project.id), project);
+
+      state.projects.find((task, index) => {
+        if (task.id === project.id) {
+          if (isEqual(task, project)) {
+            state.loaded = true;
+            return commit("SET_MESSAGE", {
+              error: "No changes detected",
             });
-            
-            return resolve("success");
           }
-        }, 1000)
-      );
+          state.projects.splice(index, 1);
+          state.projects = [...state.projects, project];
+          state.loaded = true;
+          return commit("SET_MESSAGE", {
+            success: "Project Updated",
+          });
+        }
+      });
+    },
+
+    async getAllProjects({ state, commit }) {
+      state.loaded = false;
+      state.offline = false;
+      try {
+        const querySnapshot = getDocs(collection(firestore.db, "projects"));
+
+        if (!(await querySnapshot).empty) {
+          querySnapshot.forEach((doc) => {
+            if (!state.projects.some((task) => task.id === doc.id)) {
+              let obj = {
+                id: doc.id,
+                title: doc.data().title,
+                description: doc.data().description,
+                state: doc.data().state,
+                complete: doc.data().complete,
+              };
+              state.projects.push(obj);
+            }
+          });
+          return (state.loaded = true);
+        }
+        commit("SET_MESSAGE", {
+          error: "No Project Found",
+        });
+      } catch (error) {
+        console.log(error);
+        commit("SET_MESSAGE", { error: "Something Went wrong." });
+        state.offline = true;
+      }
+      return (state.loaded = true);
     },
   },
 });
