@@ -14,7 +14,8 @@ const routes = [
     // route level code-splitting
     // this generates a separate chunk (description.[hash].js) for this route
     // which is lazy-loaded when the route is visited.
-    component: () => import(/* webpackChunkName: 'user' */"@/views/Description"),
+    component: () =>
+      import(/* webpackChunkName: 'user' */ "@/views/Description"),
     params: true,
   },
   {
@@ -23,7 +24,7 @@ const routes = [
     // route level code-splitting
     // this generates a separate chunk (edit.[hash].js) for this route
     // which is lazy-loaded when the route is visited.
-    component: () => import(/* webpackChunkName: "user"*/"@/views/Edit"),
+    component: () => import(/* webpackChunkName: "user"*/ "@/views/Edit"),
     params: true,
   },
 ];

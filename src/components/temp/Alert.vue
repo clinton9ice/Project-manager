@@ -59,7 +59,7 @@ export default {
   transition: all 0.5s linear;
   transform-style: preserve-3d;
   z-index: 1500;
-   transform: translateY(300px);
+  transform: translateY(300px);
   opacity: 0;
   animation: slideUp 0.5s linear;
 
@@ -90,19 +90,19 @@ export default {
       animation: progress 2s linear forwards 0.5s;
     }
   }
-     @keyframes slideUp {
-      0% {
-        transform: translateY(300px);
-      }
-      100% {
-        opacity: 1;
-        transform: translateY(0);
-      }
+  @keyframes slideUp {
+    0% {
+      transform: translateY(300px);
     }
+    100% {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
 
   &.active {
-        opacity: 1;
-        transform: translateY(0);
+    opacity: 1;
+    transform: translateY(0);
 
     .progress {
       @keyframes progress {

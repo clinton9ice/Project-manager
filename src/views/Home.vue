@@ -1,6 +1,5 @@
 <template>
   <div class="container-fluid px-3 py-5">
-
     <h3 class="project-title">Projects</h3>
 
     <div class="project-container d-flex justify-content-between flex-wrap">
@@ -12,7 +11,7 @@
 
       <Collection
         header="inProgress"
-        v-if="projectInProgress"
+        v-if="projectInProgress.length > 0"
         :total="projectInProgress.length"
       >
         <div v-for="inProgress in projectInProgress" :key="inProgress.id">
@@ -25,7 +24,7 @@
 
       <Collection
         header="complete"
-        v-if="completeProjects"
+        v-if="completeProjects.length > 0"
         :total="completeProjects.length"
       >
         <div v-for="project in completeProjects" :key="project.id">
@@ -43,15 +42,19 @@ import Collection from "@/components/Collection";
 import ProjectCard from "@/components/Project-card";
 import Modal from "@/components/Modal";
 
-import { mapGetters, mapState } from "vuex";
+import { mapGetters } from "vuex";
 
 export default {
   components: {
     Collection,
     ProjectCard,
-    Modal
+    Modal,
   },
-  computed: mapGetters(["allProject", "completeProjects", "projectInProgress", "modal"]),
+  computed: mapGetters([
+    "allProject",
+    "completeProjects",
+    "projectInProgress",
+    "modal",
+  ]),
 };
 </script>
-

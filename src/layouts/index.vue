@@ -1,8 +1,9 @@
 <template>
+  <offlineAlert :check="offline" />
   <Navigation> </Navigation>
   <router-view v-slot="{ Component }">
     <transition name="fade" mode="out-in">
-      <component :is="Component" v-if="isLoaded"></component>
+      <component :is="Component" v-if="loaded"></component>
       <loader v-else :overlay="true"></loader>
     </transition>
   </router-view>
@@ -15,22 +16,19 @@ import Navigation from "@/components/Navigation";
 import Alert from "@/components/temp/Alert";
 import { mapState } from "vuex";
 import Loader from "@/components/Loader";
+import offlineAlert from "@/components/Offline";
 
 export default {
   components: {
     Navigation,
     Alert,
     Loader,
+    offlineAlert,
   },
-  data() {
-    return { isLoaded: false };
+  computed: mapState(["message", "loaded", "offline"]),
+  created() {
+    this.$store.dispatch("getAllProjects");
   },
-  mounted() {
-    setTimeout(() => {
-      this.isLoaded = true;
-    }, 2000);
-  },
-  computed: mapState(["message"]),
 };
 </script>
 

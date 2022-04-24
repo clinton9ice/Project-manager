@@ -144,7 +144,7 @@ export default {
 
   .form-control {
     padding-right: 3rem;
-    border-color: #f5f5f5;
+    //border-color: #f5f5f5;
     transition: 300ms ease;
   }
   .form-control:focus,
