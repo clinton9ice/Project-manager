@@ -140,8 +140,8 @@
           <div class="list-container" v-for="media in social" :key="media.url">
             <li class="list-item" v-if="media.type === 'tel'">
               <a :href="'tel:' + media.url" class="text-link">
-               <span :class="[media.icon, 'icon']"></span>
-               </a>
+                <span :class="[media.icon, 'icon']"></span>
+              </a>
             </li>
 
             <li class="list-item" v-if="media.type === 'social'">

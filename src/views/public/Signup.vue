@@ -117,7 +117,12 @@
       </div>
     </div>
 
-    <loader name="flow" v-if="load" :overlay="true" style="position: fixed"></loader>
+    <loader
+      name="flow"
+      v-if="load"
+      :overlay="true"
+      style="position: fixed"
+    ></loader>
   </div>
 </template>
 
@@ -150,23 +155,22 @@ export default {
     showPassword() {
       this.password = !this.password;
     },
-     submit() {
+    submit() {
       // Pop up the loader
       this.load = true;
-      setTimeout(async ()=>{
-        
+      setTimeout(async () => {
         await this.$store
           .dispatch("signUp", this.data)
           .then(() => (this.load = false));
-      }, 1000)
+      }, 1000);
     },
 
     connectGoogle() {
       this.load = true;
       // Trigger google service
-      this.$store.dispatch("signInWithGooogle").then( () => {
+      this.$store.dispatch("signInWithGooogle").then(() => {
         this.load = true;
-      })
+      });
 
       // setTimeout(() => {
       //   this.load = false;

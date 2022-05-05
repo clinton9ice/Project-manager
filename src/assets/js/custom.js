@@ -5,22 +5,22 @@ $(document).ready(() => {
       if (window.innerWidth < 900) {
         $("#toggle-menu").slideUp(500);
         $("#navToggler").removeClass("active");
-  
       }
     });
-  
+
     $("#navToggler").on("click", function () {
       $(this).toggleClass("active");
-      $("#toggle-menu").slideToggle(500)
-    })
-  
+      $("#toggle-menu").slideToggle(500);
+    });
+
     // SMOOTHSCROLL NAVBAR
     $(function () {
       $(".navbar .default, .hero-text a").on("click", function (event) {
         var $anchor = $(this);
         $("html, body")
           .stop()
-          .animate({
+          .animate(
+            {
               scrollTop: $($anchor.attr("href")).offset().top - 90,
             },
             500
@@ -29,5 +29,4 @@ $(document).ready(() => {
       });
     });
   });
-  
-})
+});

@@ -74,7 +74,7 @@ export default {
         margin-top: 0px;
       }
 
-        @media only screen and (max-width: 767px) {
+      @media only screen and (max-width: 767px) {
         height: 150px;
 
         h1 {

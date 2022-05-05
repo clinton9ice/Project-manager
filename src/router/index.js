@@ -1,12 +1,12 @@
 import { createRouter, createWebHistory } from "vue-router";
 import { sessionExist } from "@/helper/Helper";
 
-
 const routes = [
   {
     path: "/admin",
     name: "admin",
-    component: () => import(/* webpackChunkName: 'admin' */ "@/views/admin/Home.vue"),
+    component: () =>
+      import(/* webpackChunkName: 'admin' */ "@/views/admin/Home.vue"),
     meta: {
       auth: true,
     },
@@ -30,7 +30,8 @@ const routes = [
     // route level code-splitting
     // this generates a separate chunk (edit.[hash].js) for this route
     // which is lazy-loaded when the route is visited.
-    component: () => import(/* webpackChunkName: "admin"*/ "@/views/admin/Edit"),
+    component: () =>
+      import(/* webpackChunkName: "admin"*/ "@/views/admin/Edit"),
     params: true,
     meta: {
       auth: true,
@@ -42,7 +43,8 @@ const routes = [
     // route level code-splitting
     // this generates a separate chunk (edit.[hash].js) for this route
     // which is lazy-loaded when the route is visited.
-    component: () => import(/* webpackChunkName: "admin"*/ "@/views/admin/Settings"),
+    component: () =>
+      import(/* webpackChunkName: "admin"*/ "@/views/admin/Settings"),
     params: true,
     meta: {
       auth: true,
@@ -76,15 +78,15 @@ const routes = [
     component: () =>
       import(/* webpackChunkName: 'public' */ "@/views/public/Signin"),
   },
-   {
-     path: "/:pathMatch(.*)*",
-     name: "not-found",
-     // route level code-splitting
-     // this generates a separate chunk (description.[hash].js) for this route
-     // which is lazy-loaded when the route is visited.
-     component: () =>
-       import( /* webpackChunkName: 'public' */ "@/views/NotFound"),
-   },
+  {
+    path: "/:pathMatch(.*)*",
+    name: "not-found",
+    // route level code-splitting
+    // this generates a separate chunk (description.[hash].js) for this route
+    // which is lazy-loaded when the route is visited.
+    component: () =>
+      import(/* webpackChunkName: 'public' */ "@/views/NotFound"),
+  },
 ];
 
 const router = createRouter({

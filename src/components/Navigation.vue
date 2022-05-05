@@ -45,33 +45,36 @@
         <img src="@/assets/images/Taskey-logo.svg" />
       </router-link>
 
-
-<div class="d-flex align-items-center">
-    <div class="thumbnail-box rounded-circle mx-3" v-if="isMobile() && $store.state.user">
-          <img :src="$store.getters.user.photoURL || data.profilePics" alt="User picture" class="img-thumbnail rounded-circle"
-            @click="Dropdown">
-      </div>
+      <div class="d-flex align-items-center">
+        <div
+          class="thumbnail-box rounded-circle mx-3"
+          v-if="isMobile() && $store.state.user"
+        >
+          <img
+            :src="$store.getters.user.photoURL || data.profilePics"
+            alt="User picture"
+            class="img-thumbnail rounded-circle"
+            @click="Dropdown"
+          />
+        </div>
         <button type="button" class="btn nav-toggler" id="navToggler">
           <span></span>
         </button>
 
         <div class="dropdown-menu" id="admin-menu">
-            <button class="dropdown-item" type="button">
-                <router-link
-              :to="{ name: 'admin' }"
-              class="nav-link p-0"
+          <button class="dropdown-item" type="button">
+            <router-link :to="{ name: 'admin' }" class="nav-link p-0"
               >Dashboard</router-link
             >
-            </button>
-            <button class="dropdown-item" type="button">
-              <router-link :to="{name: 'settings'}">Settings</router-link>
-            </button>
-            <button class="text-danger btn" @click="$store.dispatch('signOut')">
-              Sign out
-            </button>
-                 
+          </button>
+          <button class="dropdown-item" type="button">
+            <router-link :to="{ name: 'settings' }">Settings</router-link>
+          </button>
+          <button class="text-danger btn" @click="$store.dispatch('signOut')">
+            Sign out
+          </button>
         </div>
-    </div>
+      </div>
       <div class="navbar-container" id="toggle-menu">
         <ul class="navbar-nav">
           <li class="nav-item">
@@ -122,14 +125,15 @@
             <i class="bi bi-search text-secondary"></i>
           </button>
         </form>
-      <div class="thumbnail-box" v-if="!isMobile() && $store.state.user">
-          <img :src="$store.state.user.photoURL || data.profilePics" alt="User picture" class="img-thumbnail rounded-circle"
-            @click="Dropdown">
+        <div class="thumbnail-box" v-if="!isMobile() && $store.state.user">
+          <img
+            :src="$store.state.user.photoURL || data.profilePics"
+            alt="User picture"
+            class="img-thumbnail rounded-circle"
+            @click="Dropdown"
+          />
+        </div>
       </div>
-      </div>
-      
-      
-      
     </nav>
   </header>
 </template>
@@ -147,13 +151,13 @@ export default {
       searchResult: "",
       openSearch: false,
       dropdown: false,
-      profilePics: "https://cdn-icons-png.flaticon.com/512/149/149071.png"
+      profilePics: "https://cdn-icons-png.flaticon.com/512/149/149071.png",
     });
     function isMobile(params) {
-      return window.innerWidth <= 990
+      return window.innerWidth <= 990;
     }
     const store = useStore();
-   
+
     return { data, isLogged: false, isMobile, store };
   },
   methods: {
@@ -178,13 +182,15 @@ export default {
       this.CLEAR();
     },
 
-    Dropdown(){
-      var dropdownElementList = [].slice.call(document.querySelectorAll('.dropdown-toggle'))
+    Dropdown() {
+      var dropdownElementList = [].slice.call(
+        document.querySelectorAll(".dropdown-toggle")
+      );
       var dropdownList = dropdownElementList.map(function (dropdownToggleEl) {
-      return new bootstrap.Dropdown(dropdownToggleEl)
-      })
-      $("#admin-menu").toggleClass("show")
-    }
+        return new bootstrap.Dropdown(dropdownToggleEl);
+      });
+      $("#admin-menu").toggleClass("show");
+    },
   },
 };
 </script>
@@ -227,22 +233,22 @@ export default {
   margin-bottom: 1rem;
 }
 
-.img-thumbnail{
-      background: var(--dark-color);
-      border-color:  var(--dark-color);
-      /* padding: 0; */
-    width: 60px;
-    object-fit: cover;
-    object-position: inherit;
-    cursor: pointer;
+.img-thumbnail {
+  background: var(--dark-color);
+  border-color: var(--dark-color);
+  /* padding: 0; */
+  width: 60px;
+  object-fit: cover;
+  object-position: inherit;
+  cursor: pointer;
 }
-.dropdown-menu{
+.dropdown-menu {
   top: 76px;
-    right: 0;
+  right: 0;
 }
 
-@media screen and (max-width: 992px){
-  .img-thumbnail{
+@media screen and (max-width: 992px) {
+  .img-thumbnail {
     width: 45px;
   }
 }

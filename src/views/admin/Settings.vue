@@ -149,7 +149,9 @@
         </p>
       </div>
 
-      <div class="card-body d-flex justify-content-between flex-wrap align-items-center pt-0">
+      <div
+        class="card-body d-flex justify-content-between flex-wrap align-items-center pt-0"
+      >
         <div class="d-flex align-items-center mb-sm-0 mb-4">
           <div>
             <div class="form-check form-switch mb-0">
@@ -216,7 +218,7 @@ export default {
         });
         return;
       }
-      await store.dispatch("delete_acc")
+      await store.dispatch("delete_acc");
     };
 
     const updateProfile = async () => {

@@ -581,20 +581,19 @@ export default createStore({
     },
 
     async delete_acc({ commit, state, dispatch }) {
-   
-  //  await deleteDoc(
-  //       doc(collection(firestore.db, "users", state.user.uid, "projects"))
-  //     );
-       deleteUser(auth.currentUser).catch((error) => {
-          // An error ocurred
-            commit("SET_MESSAGE", {
-              error: error.code
-                .replaceAll("auth/", "")
-                .replaceAll("-", " ")
-                .toUpperCase(),
-            });
-       });
-      dispatch("signOut")
+      //  await deleteDoc(
+      //       doc(collection(firestore.db, "users", state.user.uid, "projects"))
+      //     );
+      deleteUser(auth.currentUser).catch((error) => {
+        // An error ocurred
+        commit("SET_MESSAGE", {
+          error: error.code
+            .replaceAll("auth/", "")
+            .replaceAll("-", " ")
+            .toUpperCase(),
+        });
+      });
+      dispatch("signOut");
       commit("SET_MESSAGE", {
         success: "Account deleted Successfully",
       });

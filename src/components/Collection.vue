@@ -41,7 +41,6 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-
 .card {
   position: relative;
   max-width: 350px;
@@ -95,9 +94,9 @@ export default {
     padding: 1rem;
   }
 }
- @media screen and (max-width: 700px){
-.cards-container{
-width: 100%;
-}
+@media screen and (max-width: 700px) {
+  .cards-container {
+    width: 100%;
+  }
 }
 </style>
