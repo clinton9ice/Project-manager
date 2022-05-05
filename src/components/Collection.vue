@@ -41,12 +41,15 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+
 .card {
+  position: relative;
   max-width: 350px;
-  margin: 2rem;
+  margin: 2rem auto;
   border-radius: 6px !important;
   overflow: hidden;
-  min-width: 300px;
+  width: 100%;
+  min-width: 250px;
 
   .card-header {
     border: none;
@@ -91,5 +94,10 @@ export default {
     overflow-y: auto;
     padding: 1rem;
   }
+}
+ @media screen and (max-width: 700px){
+.cards-container{
+width: 100%;
+}
 }
 </style>

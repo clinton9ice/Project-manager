@@ -7,15 +7,13 @@ import { getFirestore } from "firebase/firestore";
 
 // Your web app's Firebase configuration
 // For Firebase JS SDK v7.20.0 and later, measurementId is optional
-//Provide Your Firebase SDK in the firebase config variable
-const firebaseConfig = {};
+const firebaseConfig = {
+
+};
 
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
 
 // Initialize Cloud Firestore and get a reference to the service
-const db = getFirestore(app);
-
-export default {
-  db,
-};
+const firestore = getFirestore(app);
+export default { db: firestore, app };

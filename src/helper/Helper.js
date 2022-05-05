@@ -40,7 +40,20 @@ function isEqual(arr1, arr2) {
   return true;
 }
 
+function setSession(key, value){
+  return sessionStorage.setItem(key, value);
+}
+
+function sessionExist(e) {
+  return sessionStorage.getItem(e) !== null;
+}
+function killSession(e) {
+   return sessionStorage.removeItem(e)
+ }
 module.exports = {
   isObject,
   isEqual,
+  sessionExist,
+  setSession,
+  killSession
 };

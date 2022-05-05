@@ -119,5 +119,6 @@ export default {
   background: #e5e6e9fa;
   backdrop-filter: blur(2px);
   transition: 200ms ease-in-out;
+  z-index: 10;
 }
 </style>

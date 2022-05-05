@@ -114,7 +114,6 @@ export default {
   box-shadow: -4px 15px 6px #00000014;
   border-radius: 6px;
   margin-bottom: 4rem;
-  cursor: grab;
 
   .project-title {
     display: flex;

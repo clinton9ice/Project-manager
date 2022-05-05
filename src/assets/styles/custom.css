@@ -1,7 +1,0 @@
-.form-control,.btn, .form-select{
-    box-shadow: none !important;
-}
-body{
-    background-color: var(--bs-gray-200);
-  
-}

@@ -2,7 +2,7 @@
   <transition name="slide" mode="in-out">
     <div class="modal" v-show="open" :class="{ active: modal.isActive }">
       <div class="modal-dialog">
-        <form class="modal-content" @submit.prevent="submit">
+        <form class="modal-content" id="form" @submit.prevent="submit">
           <div class="modal-header">
             <h5 class="modal-title" id="exampleModalLabel">New Project</h5>
             <button
@@ -15,43 +15,41 @@
           </div>
 
           <div class="modal-body">
-            <form id="form">
-              <div class="mb-3">
-                <label for="recipient-name" class="col-form-label">Title</label>
-                <input
-                  type="text"
-                  class="form-control"
-                  id="recipient-name"
-                  v-model.trim="obj.title"
-                  required="required"
-                />
-              </div>
+            <div class="mb-3">
+              <label for="recipient-name" class="col-form-label">Title</label>
+              <input
+                type="text"
+                class="form-control"
+                id="recipient-name"
+                v-model.trim="obj.title"
+                required="required"
+              />
+            </div>
 
-              <div class="mb-3">
-                <label class="col-form-label">Description:</label>
-                <QuillEditor
-                  v-model:content="obj.description"
-                  style="min-height: 40vh !important"
-                />
-              </div>
+            <div class="mb-3">
+              <label class="col-form-label">Description:</label>
+              <QuillEditor
+                v-model:content="obj.description"
+                style="min-height: 40vh !important"
+              />
+            </div>
 
-              <div class="mb-3">
-                <select
-                  name="form-select"
-                  class="form-select"
-                  v-model="obj.status"
+            <div class="mb-3">
+              <select
+                name="form-select"
+                class="form-select"
+                v-model="obj.status"
+              >
+                <!-- <option disabled="disabled" value="">Select One</option> -->
+                <option
+                  v-for="option in statusOptions"
+                  :value="option"
+                  :key="option"
                 >
-                  <!-- <option disabled="disabled" value="">Select One</option> -->
-                  <option
-                    v-for="option in statusOptions"
-                    :value="option"
-                    :key="option"
-                  >
-                    {{ option }}
-                  </option>
-                </select>
-              </div>
-            </form>
+                  {{ option }}
+                </option>
+              </select>
+            </div>
           </div>
 
           <div class="modal-footer">
@@ -93,13 +91,19 @@ export default {
       status: props.header,
       description: "",
     };
-    return { store, obj, statusOptions: store.state.projectStatus };
+    return {
+      store,
+      obj,
+      statusOptions: store.state.projectStatus,
+      verified: store.getters.user.emailVerified,
+    };
   },
 
   methods: {
     // Submit form
     submit() {
       let err = false;
+      if (!this.verified) return alert("Verify your email to proceed");
       const data = {
         title: this.obj.title,
         date: dateCombined,
@@ -148,6 +152,10 @@ export default {
   transform-origin: right;
   transform-style: preserve-3d;
   transform: translateX(0);
+
+  .modal-body {
+    overflow-y: auto;
+  }
 
   .modal-dialog {
     transition: all 0.3s ease;

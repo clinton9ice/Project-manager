@@ -41,7 +41,7 @@ export default {
     clear() {
       setTimeout(() => {
         this.active = "";
-      }, 3000);
+      }, 4000);
     },
   },
 };
@@ -87,7 +87,7 @@ export default {
       width: 0;
       border-radius: 0;
       transition: 0.5s ease;
-      animation: progress 2s linear forwards 0.5s;
+      animation: progress 3s linear forwards 0.5s;
     }
   }
   @keyframes slideUp {

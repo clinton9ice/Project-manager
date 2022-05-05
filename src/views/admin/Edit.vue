@@ -54,7 +54,7 @@
       </form>
     </div>
   </div>
-  <Loader name="flow" :overlay="true" v-else />
+  <Loader name="pulse" :overlay="true" v-else />
 </template>
 
 <script>
@@ -115,8 +115,8 @@ export default {
       await this.store.dispatch("edit_project", this.data);
       // Redirect
       setTimeout(() => {
-        this.$router.push({ name: "Home" });
-      }, 3000);
+        this.$router.push({ name: "admin" });
+      }, 2000);
     },
   },
   created() {
