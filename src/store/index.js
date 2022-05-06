@@ -8,7 +8,7 @@ import firestore from "@/firebase/config";
 // Import router
 import router from "@/router";
 
-// Import authentication modules
+// Import authentication Collections
 import {
   getAuth,
   createUserWithEmailAndPassword,
@@ -19,20 +19,18 @@ import {
   sendEmailVerification,
   GoogleAuthProvider,
   signInWithRedirect,
-  updateEmail,
-  updatePassword,
+  sendPasswordResetEmail,
   deleteUser,
 } from "firebase/auth";
 
 const auth = getAuth();
 import { setSession, killSession } from "@/helper/Helper";
-// Import project collections
+// Import firestore collections
 import {
   collection,
   getDocs,
   getDoc,
   addDoc,
-  setDoc,
   doc,
   deleteDoc,
   updateDoc,
@@ -254,9 +252,15 @@ export default createStore({
 
     UPDATE_PROFILE(state, data) {
       // Deconstruct the data object
-      const { email, profileUrl, name } = data;
-      // console.log(state.user);
+      const { profileUrl, name } = data;
 
+      if (
+        name.toLowerCase() === state.user.displayName.toLowerCase() &&
+        profileUrl === state.user.photoURL
+      ) {
+        this.commit("SET_MESSAGE", { error: "No changes found" });
+        return;
+      }
       // Update the name and profile image
       if (name && profileUrl) {
         updateProfile(auth.currentUser, {
@@ -272,24 +276,7 @@ export default createStore({
             // An error occurred
             console.log(error);
             this.commit("SET_MESSAGE", {
-              error: "Something went wrong, check your terminal.",
-            });
-          });
-      }
-      if (email.toLowerCase() && email !== state.user.email) {
-        updateEmail(auth.currentUser, "user@example.com")
-          .then(() => {
-            // Email updated!
-            this.commit("SET_MESSAGE", {
-              success:
-                "Email Updated successfully. You should go ahead to confirm your new mail",
-            });
-          })
-          .catch((error) => {
-            // An error occurred
-            console.log(error);
-            this.commit("SET_MESSAGE", {
-              error: "Something went wrong, check your terminal.",
+              error: "Something went wrong :" + error.code,
             });
           });
       }
@@ -464,17 +451,22 @@ export default createStore({
       const { email, password, name } = details;
       try {
         await createUserWithEmailAndPassword(auth, email, password);
+
         // Sent verificaction Email
         sendEmailVerification(auth.currentUser);
+
         commit("SET_MESSAGE", {
           success: "A verification code has been sent to your email address",
         });
+
         // Update the users profile name
-        updateProfile(auth.currentUser, {
+        await updateProfile(auth.currentUser, {
           displayName: name,
         });
+
         // Authenticate user
         commit("SET_USER", auth.currentUser);
+
         router.push({
           name: "admin",
         });
@@ -486,6 +478,11 @@ export default createStore({
             });
             break;
 
+          case "auth/invalid-sender":
+            commit("SET_MESSAGE", {
+              error: "Sender Not recognised",
+            });
+            break;
           default:
             commit("SET_MESSAGE", {
               error: error.code
@@ -559,40 +556,57 @@ export default createStore({
       commit("CLEAR_MESSAGES");
     },
 
-    update_profile({ commit, state }, data) {
+    async update_profile({ commit, dispatch }, data) {
       commit("UPDATE_PROFILE", data);
-      new Promise((resolve) => {
-        resolve(state.user);
-      });
+      setTimeout(dispatch("fetchUser"), 2000);
     },
 
-    update_password({ commit }, password) {
-      updatePassword(auth.currentUser, password)
+    // update_password({ commit }, password) {
+    //   updatePassword(auth.currentUser, password)
+    //     .then(() => {
+    //       // Update successful.
+    //       commit("SET_MESSAGE", { success: "Password changed successfully" });
+    //     })
+    //     .catch((error) => {
+    //       // An error ocurred
+    //       commit("SET_MESSAGE", {
+    //         error: "something went wrong" + error.code,
+    //       });
+    //     });
+    // },
+
+    async resetPass({ commit }, email) {
+      sendPasswordResetEmail(auth, email)
         .then(() => {
-          // Update successful.
-          commit("SET_MESSAGE", { success: "Password changed successfully" });
+          // Password reset email sent!
+          commit("SET_MESSAGE", {
+            success: "Email verification code has been sent.",
+          });
         })
         .catch((error) => {
-          // An error ocurred
-          commit("SET_MESSAGE", {
-            error: "something went wrong" + error.code,
-          });
+          const errorCode = error.code;
+
+          switch (errorCode) {
+            case "auth/user-not-found":
+              commit("SET_MESSAGE", {
+                error: "This account does not exist",
+              });
+              break;
+
+            default:
+              commit("SET_MESSAGE", {
+                error: error.code
+                  .replaceAll("auth/", "")
+                  .replaceAll("-", " ")
+                  .toUpperCase(),
+              });
+              break;
+          }
         });
     },
 
     async delete_acc({ commit, state, dispatch }) {
-      //  await deleteDoc(
-      //       doc(collection(firestore.db, "users", state.user.uid, "projects"))
-      //     );
-      deleteUser(auth.currentUser).catch((error) => {
-        // An error ocurred
-        commit("SET_MESSAGE", {
-          error: error.code
-            .replaceAll("auth/", "")
-            .replaceAll("-", " ")
-            .toUpperCase(),
-        });
-      });
+      await deleteUser(auth.currentUser);
       dispatch("signOut");
       commit("SET_MESSAGE", {
         success: "Account deleted Successfully",

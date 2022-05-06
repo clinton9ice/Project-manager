@@ -6,6 +6,8 @@ $(document).ready(() => {
         $("#toggle-menu").slideUp(500);
         $("#navToggler").removeClass("active");
       }
+      // Remove the dropdown menu
+      $("#admin-menu").removeClass("show");
     });
 
     $("#navToggler").on("click", function () {

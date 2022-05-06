@@ -23,6 +23,7 @@
                 id="recipient-name"
                 v-model.trim="obj.title"
                 required="required"
+                autocomplete="off"
               />
             </div>
 
@@ -61,7 +62,7 @@
             >
               Close
             </button>
-            <button type="submit" class="btn btn-primary">Send message</button>
+            <button type="submit" class="btn btn-primary">Save Task</button>
           </div>
         </form>
       </div>

@@ -59,6 +59,7 @@
               class="form-control"
               type="email"
               v-model.trim="profile.email"
+              readonly
               required
             />
           </div>
@@ -70,6 +71,7 @@
               id="profileUrl"
               v-model.trim="profile.profileUrl"
               required
+              autocomplete="off"
             />
           </div>
           <button
@@ -103,39 +105,54 @@
       <br />
 
       <div class="card-body pt-0">
-        <div class="form-group mb-4">
-          <label class="form-label mb-2">Current password</label>
-          <input
-            class="form-control"
-            type="password"
-            placeholder="Current password"
-            v-model.trim="profile.current_password"
-          />
+        <div class="alert alert-danger" v-if="setting.error">
+          Sorry but this feature is under process. Kindly
+          <strong @click="$store.dispatch('signOut')" style="cursor: pointer"
+            >logout</strong
+          >
+          and use the forgotten passwords link to reset your password
         </div>
+        <form @submit.prevent="resetPass">
+          <div class="form-group mb-4">
+            <label class="form-label mb-2">Current password</label>
+            <input
+              class="form-control"
+              type="password"
+              placeholder="Current password"
+              v-model.trim="profile.current_password"
+              minlength="6"
+              required
+            />
+          </div>
 
-        <div class="form-group mb-4">
-          <label class="form-label mb-2">New password</label>
-          <input
-            class="form-control"
-            type="password"
-            placeholder="New password"
-            v-model.trim="profile.new_password"
-          />
-        </div>
+          <div class="form-group mb-4">
+            <label class="form-label mb-2">New password</label>
+            <input
+              class="form-control"
+              type="password"
+              placeholder="New password"
+              minlength="6"
+              v-model.trim="profile.new_password"
+              required
+            />
+          </div>
 
-        <div class="form-group mb-4">
-          <label class="form-label mb-2">Confirm new password</label>
-          <input
-            class="form-control"
-            type="password"
-            placeholder="Confirm password"
-            v-model.trim="profile.c_pass"
-          />
-        </div>
+          <div class="form-group mb-4">
+            <label class="form-label mb-2">Confirm new password</label>
+            <input
+              class="form-control"
+              type="password"
+              placeholder="Confirm password"
+              minlength="6"
+              v-model.trim="profile.c_pass"
+              required
+            />
+          </div>
 
-        <button @click="resetPass" class="btn btn-outline-primary btn-sm mt-6">
-          Update password
-        </button>
+          <button type="submit" class="btn btn-outline-primary btn-sm mt-6">
+            Update password
+          </button>
+        </form>
       </div>
     </div>
     <!-- /// -->
@@ -203,6 +220,7 @@ export default {
 
     const setting = reactive({
       isClicked: false,
+      error: false,
     });
 
     const initData = reactive({
@@ -214,41 +232,41 @@ export default {
     const deleteAcc = async () => {
       if (!profile.confirm) {
         store.commit("SET_MESSAGE", {
-          error: "You need to confirm your account deletion",
+          error: "You haven't confirmed your action",
         });
         return;
       }
       await store.dispatch("delete_acc");
     };
 
-    const updateProfile = async () => {
+    const updateProfile = () => {
       setting.isClicked = true;
 
-      if (!store.state.emailVerified) {
+      if (!store.state.user.emailVerified) {
         store.commit("SET_MESSAGE", {
           error: "You need to verify Your email to make changes",
         });
         return;
       }
-      if (
-        profile.email === initData.user.email &&
-        profile.name === initData.displayName &&
-        profile.profileUrl === initData.photoURL
-      ) {
+      if (!profile.email || !profile.name || !profile.profileUrl) {
         // Send an error report
-        store.commit("SET_MESSAGE", { error: "No Changes detected" });
+        store.commit("SET_MESSAGE", { error: "Your inputs are empty" });
         setting.isClicked = false;
         return;
       }
 
       // Send to files to the store to update
-      await store.dispatch("update_profile", profile);
-      setting.isClicked = false;
+      setTimeout(async () => {
+        await store.dispatch("update_profile", profile);
+        setting.isClicked = false;
+      }, 2000);
     };
 
     const resetPass = async () => {
+      // Reset the error prop
+      setting.error = false;
       const { current_password, new_password, c_pass } = profile;
-      if (!store.state.emailVerified) {
+      if (!store.state.user.emailVerified) {
         store.commit("SET_MESSAGE", {
           error: "You need to verify Your email to make changes",
         });
@@ -261,16 +279,25 @@ export default {
         });
         return;
       }
-      console.log(new_password, current_password);
 
-      if (new_password === current_password) {
+      if (current_password.length < 6 || new_password.length < 6) {
         store.commit("SET_MESSAGE", {
-          error: "Current password can't be the same with the new password",
+          error: "Your password should not be less than 6",
         });
         return;
       }
 
-      await store.dispatch("update_password", new_password);
+      if (new_password === current_password) {
+        store.commit("SET_MESSAGE", {
+          error: "Old password can't be the same with the new password",
+        });
+        return;
+      }
+      setting.error = true;
+      store.commit("SET_MESSAGE", {
+        error:
+          "Sorry but this feature is under process. Kindly logout and use the forgotten passwords link to reset your password",
+      });
     };
 
     return {

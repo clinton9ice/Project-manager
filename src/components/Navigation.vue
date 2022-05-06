@@ -183,12 +183,6 @@ export default {
     },
 
     Dropdown() {
-      var dropdownElementList = [].slice.call(
-        document.querySelectorAll(".dropdown-toggle")
-      );
-      var dropdownList = dropdownElementList.map(function (dropdownToggleEl) {
-        return new bootstrap.Dropdown(dropdownToggleEl);
-      });
       $("#admin-menu").toggleClass("show");
     },
   },
@@ -238,6 +232,7 @@ export default {
   border-color: var(--dark-color);
   /* padding: 0; */
   width: 60px;
+  height: 60px;
   object-fit: cover;
   object-position: inherit;
   cursor: pointer;
@@ -250,6 +245,7 @@ export default {
 @media screen and (max-width: 992px) {
   .img-thumbnail {
     width: 45px;
+    height: 45px;
   }
 }
 </style>

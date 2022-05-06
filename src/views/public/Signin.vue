@@ -27,7 +27,7 @@
             <form class="login-form" @submit.prevent="submit">
               <div class="form-group">
                 <label for="email" class="label"> Email</label>
-                <div class="form-row">
+                <div class="form-row mt-2">
                   <input
                     type="email"
                     id="email"
@@ -44,8 +44,13 @@
                 </div>
               </div>
               <div class="form-group">
-                <label for="password" class="label"> Password</label>
-                <div class="form-row">
+                <div class="d-flex align-item-center justify-content-between">
+                  <label for="password" class="label"> Password</label>
+                  <router-link :to="{ name: 'resetPassword' }" class="small"
+                    >Forgotten password?</router-link
+                  >
+                </div>
+                <div class="form-row mt-2">
                   <input
                     :type="[viewPass ? 'text' : 'password']"
                     name="password"
@@ -133,7 +138,3 @@ export default {
   },
 };
 </script>
-
-<!-- <style lang="scss" scoped>
-
-</style> -->
