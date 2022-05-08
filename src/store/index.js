@@ -109,7 +109,7 @@ export default createStore({
 
     async ADD_PROJECT(state, project) {
       if (typeof project !== "object") throw new Error("Project not an object");
-      const cityRef = collection(
+      const query = collection(
         firestore.db,
         "users",
         state.user.uid,
@@ -120,7 +120,7 @@ export default createStore({
       state.loaded = false;
       console.log(project);
 
-      const req = await addDoc(cityRef, project);
+      const req = await addDoc(query, project);
 
       project.complete = project.state.toLowerCase() === "complete";
 
@@ -400,6 +400,7 @@ export default createStore({
               description: doc.data().description,
               state: doc.data().state,
               complete: doc.data().complete,
+              date: doc.data().date,
             };
             state.projects.push(obj);
           }
@@ -512,8 +513,12 @@ export default createStore({
           killSession("user-token");
           return commit("CLEAR_USER");
         }
-        commit("SET_USER", await user);
-        setSession("user-token", state.user.uid);
+
+         commit("SET_USER", await user);
+      
+  
+        
+         setSession("user-token", state.user.uid);
         // Fetch all project immediately
         dispatch("getAllProjects");
         // state.loaded = true;
@@ -522,6 +527,14 @@ export default createStore({
             router.currentRoute.value.name === "signin" ||
             router.currentRoute.value.name === "signup"
           ) {
+                //  Kill and redirtect the session if the user has not verified their email address
+                if (!user.emailVerified) {
+                  state.loaded = true;
+                  return router.push({
+                    name: "verify"
+                  });
+                }
+
             router.push({ name: "admin" });
           }
         }

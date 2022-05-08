@@ -50,6 +50,18 @@ const routes = [
       auth: true,
     },
   },
+  {
+    path: "/admin/verify-email/",
+    name: "verify",
+    // route level code-splitting
+    // this generates a separate chunk (edit.[hash].js) for this route
+    // which is lazy-loaded when the route is visited.
+    component: () =>
+      import(/* webpackChunkName: "admin"*/ "@/views/admin/Verify"),
+    meta: {
+      auth: true,
+    },
+  },
 
   // Public pages
   {

@@ -68,7 +68,7 @@
 
     <div class="d-flex align-items-center justify-content-between">
       <div class="date" v-if="!search">
-        {{ properties.date || "20, August 2021" }}
+        {{ properties.date }}
       </div>
       <div class="link btn btn-outline-primary">
         <router-link
@@ -104,6 +104,9 @@ export default {
       return data.replaceAll(/(<([^>]+)>)/gi, "");
     },
   },
+  created(){
+    // console.log(this.properties);
+  }
 };
 </script>
 
