@@ -1,6 +1,6 @@
 <template>
   <QuillEditor
-    :content="text"
+    :content="contents"
     ref="myQuillEditor"
     theme="snow"
     content-type="html"
@@ -18,8 +18,18 @@ export default {
   props: {
     text: String,
   },
+  data() {
+    return {
+      contents: "",
+    };
+  },
   components: {
     QuillEditor,
+  },
+  watch: {
+    text(e) {
+      this.contents = e;
+    },
   },
 };
 </script>

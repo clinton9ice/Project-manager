@@ -21,5 +21,8 @@ AOS.init({
   //   duration: 500,
   anchorPlacement: "top",
 });
+if (!navigator.cookieEnabled) {
+  alert("Please enable your browser cookie for better user experience")
+}
 
 createApp(App).use(router).use(store).mount("#app");

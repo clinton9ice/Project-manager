@@ -104,9 +104,9 @@ export default {
       return data.replaceAll(/(<([^>]+)>)/gi, "");
     },
   },
-  created(){
+  created() {
     // console.log(this.properties);
-  }
+  },
 };
 </script>
 

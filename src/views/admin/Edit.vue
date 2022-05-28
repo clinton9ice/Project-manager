@@ -3,12 +3,9 @@
     <div class="col-md-8 p-5 w-100">
       <h4 class="mb-3">Edit Project</h4>
 
-      <form
-        class="needs-validation py-4"
-        @submit.prevent="updateProject"
-        novalidate=""
-      >
+      <form class="needs-validation py-4" @submit.prevent="updateProject">
         <div class="row mb-4">
+          <!-- Title -->
           <div class="col-md-6 mb-3">
             <label for="title" class="form-label">Title</label>
             <input
@@ -20,6 +17,8 @@
             />
             <div class="invalid-feedback">Valid first name is required.</div>
           </div>
+          <!-- ====== //====== -->
+          <!-- Status -->
           <div class="mb-3 col-md-6">
             <label for="status" class="form-label">Status</label>
             <select
@@ -40,17 +39,31 @@
               </option>
             </select>
           </div>
+          <!-- /====== -->
         </div>
 
         <div class="mb-3">
           <label class="form-label mb-3">Description</label>
           <quill-editor
+            v-if="data.description"
+            :text="data.description"
             v-model:content="data.description"
             class="editor"
-            toolbar="full"
           ></quill-editor>
         </div>
-        <button class="btn btn-primary" type="submit">Update</button>
+
+        <button class="btn btn-primary" type="submit" v-if="updated">
+          Update
+        </button>
+
+        <button v-else class="btn btn-primary" type="button" disabled>
+          <span
+            class="spinner-border spinner-border-sm"
+            role="status"
+            aria-hidden="true"
+          ></span>
+          working on it...
+        </button>
       </form>
     </div>
   </div>
@@ -67,10 +80,12 @@ export default {
     Loader,
     QuillEditor,
   },
+
   setup() {
     const store = useStore();
     return { store };
   },
+
   data() {
     const options = useStore().state.projectStatus;
     const data = {
@@ -85,8 +100,10 @@ export default {
       data,
       projectStatus: options,
       isLoaded: false,
+      updated: true,
     };
   },
+
   methods: {
     project(id) {
       // Search and append the result of the fetched project
@@ -99,7 +116,7 @@ export default {
           this.data.id = id;
           this.data.title = title;
           this.data.state = state;
-          this.data.description = description || "";
+          this.data.description = description;
           this.data.complete = complete;
           this.data.date = date;
         }
@@ -110,17 +127,14 @@ export default {
     async updateProject() {
       //Check for complete state
       this.data.complete = this.data.state === "complete";
-
+      this.updated = false;
       //  Send to Edit
       await this.store.dispatch("edit_project", this.data);
-      // Redirect
-      setTimeout(() => {
-        this.$router.push({ name: "admin" });
-      }, 2000);
+      setTimeout(() => (this.updated = true), 2000);
     },
   },
-  created() {
-    this.project(this.$route.params.id);
+  async created() {
+    await this.project(this.$route.params.id);
   },
 };
 </script>

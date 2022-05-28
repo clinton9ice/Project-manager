@@ -21,7 +21,7 @@
                 type="text"
                 class="form-control"
                 id="recipient-name"
-                v-model.trim="obj.title"
+                v-model.trim="title"
                 required="required"
                 autocomplete="off"
               />
@@ -30,8 +30,15 @@
             <div class="mb-3">
               <label class="col-form-label">Description:</label>
               <QuillEditor
-                v-model:content="obj.description"
+                v-model:content="description"
                 style="min-height: 40vh !important"
+                v-if="!empty"
+              />
+              <QuillEditor
+                v-else
+                content=""
+                style="min-height: 40vh !important"
+                @focus="empty = false"
               />
             </div>
 
@@ -39,7 +46,7 @@
               <select
                 name="form-select"
                 class="form-select"
-                v-model="obj.status"
+                v-model="headerStatus"
               >
                 <!-- <option disabled="disabled" value="">Select One</option> -->
                 <option
@@ -62,7 +69,18 @@
             >
               Close
             </button>
-            <button type="submit" class="btn btn-primary">Save Task</button>
+
+            <button v-if="!saved" type="submit" class="btn btn-primary">
+              Save Task
+            </button>
+
+            <button v-else class="btn btn-primary" type="button" disabled>
+              <span
+                class="spinner-border spinner-border-sm"
+                role="status"
+                aria-hidden="true"
+              ></span>
+            </button>
           </div>
         </form>
       </div>
@@ -83,35 +101,45 @@ export default {
     header: String,
     open: Boolean,
   },
-  setup(props) {
+  setup() {
     const store = useStore();
-    const obj = {
-      id: null,
-      title: null,
-      complete: false,
-      status: props.header,
-      description: "",
-    };
     return {
       store,
-      obj,
       statusOptions: store.state.projectStatus,
       verified: store.getters.user.emailVerified,
     };
   },
 
+  data() {
+    return {
+      title: null,
+      complete: false,
+      description: "",
+      saved: false,
+      headerStatus: this.header,
+      empty: false,
+    };
+  },
+
   methods: {
     // Submit form
-    submit() {
+    async submit() {
       let err = false;
+      // false the saved status
+      this.saved = true;
+
+      // Check if the user is verified before uploading to the server
       if (!this.verified) return alert("Verify your email to proceed");
+
+      // Arrange the data to be uploaded
       const data = {
-        title: this.obj.title,
         date: dateCombined,
-        description: this.obj.description,
-        complete: this.obj.complete,
-        state: this.obj.status,
+        title: this.title,
+        description: this.description,
+        complete: this.complete,
+        state: this.headerStatus,
       };
+
       // Check for empty fields
       Object.values(data).forEach((e) => {
         if (e === null || e === "") {
@@ -120,15 +148,31 @@ export default {
       });
 
       if (!err) {
-        this.store.dispatch("insert_project", data);
-        this.resetForm(this.obj);
-      } else
-        this.$store.commit("SET_MESSAGE", { error: "All inputs are required" });
+        await this.store.dispatch("insert_project", data);
+        // Delay clearing the form
+        setTimeout(() => {
+          this.saved = false;
+          this.resetForm(this.$data);
+        }, 1000);
+        this.empty = true;
+      } else {
+        await this.$store.commit("SET_MESSAGE", {
+          error: "All inputs are required",
+        });
+        this.saved = false;
+      }
+      // Reset the loader
     },
+
     resetForm(form) {
       return Object.getOwnPropertyNames(form).forEach((prop) => {
+        // Skip objects that are not string related
         if (form[prop] === false || form[prop] === null) return;
-        return (form[prop] = null);
+        // reset the properties
+        form[prop] = null;
+        // Set the header to default selected container
+        form["headerStatus"] = this.header;
+        return form[prop];
       });
     },
     closeForm() {
@@ -137,7 +181,7 @@ export default {
   },
   watch: {
     header(header) {
-      this.obj.status = header;
+      this.headerStatus = header;
     },
   },
   computed: mapState(["modal"]),

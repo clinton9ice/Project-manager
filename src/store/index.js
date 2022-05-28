@@ -1,6 +1,7 @@
 import { createStore } from "vuex";
 import { dateCombined } from "@/components/Date";
 import { isEqual } from "@/helper/Helper";
+import sortDate from "@/helper/sortDate";
 
 // Import firestre properties
 import firestore from "@/firebase/config";
@@ -61,7 +62,8 @@ export default createStore({
         .filter((task) => {
           return !task.complete && task.state === "save";
         })
-        .reverse();
+        .sort(sortDate);
+      // .reverse();
     },
     completeProjects(state) {
       return state.projects.filter((task) => task.complete).reverse();
@@ -116,10 +118,6 @@ export default createStore({
         "projects"
       );
 
-      // Set loader
-      state.loaded = false;
-      console.log(project);
-
       const req = await addDoc(query, project);
 
       project.complete = project.state.toLowerCase() === "complete";
@@ -127,16 +125,14 @@ export default createStore({
       // Add new project to store
       if (req.id) {
         project.id = req.id;
-        state.projects.push(project);
+        state.projects.unshift(project);
 
         this.commit("SET_MESSAGE", {
           success: "Post Added successfully",
         });
-        this.commit("MODAL");
-        state.loaded = true;
       } else {
         this.commit("SET_MESSAGE", {
-          error: "Project failed to create",
+          error: "Something went wrong: Project Not Saved",
         });
       }
     },
@@ -336,52 +332,48 @@ export default createStore({
       );
     },
 
-    edit_project({ state, commit }, project) {
-      state.loaded = false;
-
-      state.projects.find(async (task, index) => {
+    async edit_project({ state, commit }, project) {
+      // Get Project
+      return state.projects.map((task, index) => {
         if (task.id === project.id) {
-          // Get the path of file that wants to be updated
-          const ref = await doc(
-            collection(firestore.db, "users", state.user.uid, "projects"),
-            project.id
-          );
-          // Check for changes in the object
+          //  Check for changes
           if (isEqual(task, project)) {
-            state.loaded = true;
-            return commit("SET_MESSAGE", {
+            commit("SET_MESSAGE", {
               error: "No changes detected",
             });
+            return;
           }
 
-          try {
-            await updateDoc(ref, {
-              title: project.title,
-              complete: project.complete,
-              description: project.description,
-              state: project.state,
-              timestamp: serverTimestamp(),
-            });
-            // Remove the prev project
-            state.projects.splice(index, 1);
-            // Add the uodated project
-            state.projects = [...state.projects, project];
-            state.loaded = true;
-            return commit("SET_MESSAGE", {
-              success: "Project Updated",
-            });
-          } catch (error) {
-            console.log(error);
-            commit("SET_MESSAGE", {
-              error: "Something went wrong, check your console.",
-            });
-            state.loaded = true;
-          }
+          (async function () {
+            try {
+              const ref = await doc(
+                collection(firestore.db, "users", state.user.uid, "projects"),
+                project.id
+              );
+
+              await updateDoc(ref, {
+                title: project.title,
+                complete: project.complete,
+                description: project.description,
+                state: project.state,
+                timestamp: serverTimestamp(),
+              });
+
+              // Remove the prev project
+              state.projects.splice(index, 1);
+
+              state.projects = [...state.projects, project];
+
+              return commit("SET_MESSAGE", {
+                success: "Project Updated",
+              });
+            } catch (error) {
+              commit("SET_MESSAGE", { error: error.code });
+            }
+          })();
+          return;
         }
       });
-
-      setTimeout(() => (state.loaded = true), 2000);
-      //  state.loaded = true;
     },
 
     async getAllProjects({ state }) {
@@ -514,26 +506,23 @@ export default createStore({
           return commit("CLEAR_USER");
         }
 
-         commit("SET_USER", await user);
-      
-  
-        
-         setSession("user-token", state.user.uid);
+        commit("SET_USER", await user);
+
+        setSession("user-token", state.user.uid);
         // Fetch all project immediately
         dispatch("getAllProjects");
-        // state.loaded = true;
+        state.loaded = true;
         if (router.isReady()) {
           if (
             router.currentRoute.value.name === "signin" ||
             router.currentRoute.value.name === "signup"
           ) {
-                //  Kill and redirtect the session if the user has not verified their email address
-                if (!user.emailVerified) {
-                  state.loaded = true;
-                  return router.push({
-                    name: "verify"
-                  });
-                }
+            //  Kill and redirtect the session if the user has not verified their email address
+            if (!user.emailVerified) {
+              return router.push({
+                name: "verify",
+              });
+            }
 
             router.push({ name: "admin" });
           }
@@ -541,9 +530,8 @@ export default createStore({
       });
     },
 
-    async signInWithGooogle({ commit, state }) {
+    async signInWithGooogle({ commit }) {
       const provider = new GoogleAuthProvider();
-      provider.setDefaultLanguage;
 
       new Promise((resolve, reject) => {
         signInWithRedirect(auth, provider)
@@ -561,7 +549,6 @@ export default createStore({
                 .toUpperCase(),
             });
             console.log(error);
-            state.loaded = true;
             reject(error);
           });
       });
@@ -573,20 +560,6 @@ export default createStore({
       commit("UPDATE_PROFILE", data);
       setTimeout(dispatch("fetchUser"), 2000);
     },
-
-    // update_password({ commit }, password) {
-    //   updatePassword(auth.currentUser, password)
-    //     .then(() => {
-    //       // Update successful.
-    //       commit("SET_MESSAGE", { success: "Password changed successfully" });
-    //     })
-    //     .catch((error) => {
-    //       // An error ocurred
-    //       commit("SET_MESSAGE", {
-    //         error: "something went wrong" + error.code,
-    //       });
-    //     });
-    // },
 
     async resetPass({ commit }, email) {
       sendPasswordResetEmail(auth, email)
@@ -618,7 +591,7 @@ export default createStore({
         });
     },
 
-    async delete_acc({ commit, state, dispatch }) {
+    async delete_acc({ commit, dispatch }) {
       await deleteUser(auth.currentUser);
       dispatch("signOut");
       commit("SET_MESSAGE", {
