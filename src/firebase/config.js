@@ -17,7 +17,13 @@ import { getFirestore } from "firebase/firestore";
 //   measurementId: "G-Z1PEBYZL67",
 // };
 const firebaseConfig = {
-
+  apiKey: "AIzaSyBUPD7ITA7Bl2WUXbIO7jaaT_ahuOGfP2E",
+  authDomain: "project-manager-b6a9c.firebaseapp.com",
+  projectId: "project-manager-b6a9c",
+  storageBucket: "project-manager-b6a9c.appspot.com",
+  messagingSenderId: "288216885564",
+  appId: "1:288216885564:web:3c0eb5d71b9893cb5b5639",
+  measurementId: "G-YMCEPQMLE4",
 };
 
 // Initialize Firebase

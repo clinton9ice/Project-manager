@@ -1,6 +1,6 @@
 Taskey | Project Manager
 ============
-[![Current Version](https://img.shields.io/badge/version-1.0.7-green.svg)](https://github.com/clinton9ice/Todo-app-application) [![Live Demo](https://img.shields.io/badge/demo-online-green.svg)](https://github.com/clinton9ice/Todo-app-application) 
+[![Current Version](https://img.shields.io/badge/version-1.0.7-green.svg)](https://github.com/clinton9ice/Project-manager.git) [![Live Demo](https://img.shields.io/badge/demo-online-green.svg)](https://taskey.nextoli.com.ng/) 
 
 Taskey is project managemen system which helps users store and update projects and it's state once any task is completed. Its sole purpose is to help make users plan's easy and enable them to keep record of total completed projects they have done. It is making use of the most secured database as its storage bucket, and an authenticated user sign in system using your gmail address or a custom email address.
 
